@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: trading-dashboard-api
+    runtime: python
+    rootDir: backend
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    preDeployCommand: PYTHONPATH=.. python -m alembic upgrade head
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: trading-dashboard-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+
+databases:
+  - name: trading-dashboard-db
+    plan: free
+    databaseName: trading_dashboard
+    user: trading_dashboard
